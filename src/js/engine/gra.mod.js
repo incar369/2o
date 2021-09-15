@@ -1,10 +1,6 @@
-import _mod from "./mod.mod"
-import cfg from "./cfg";
-import _test from "./test.object"
-import randomInt from "./randomInt";
+import mod from "./mod.mod"
 
-
-class Gra extends _mod{
+export default class Gra extends mod{
 	constructor(){
         super('Gra','prim')
 		this.canvas = (function(){
@@ -17,46 +13,31 @@ class Gra extends _mod{
         this.poolRenderObjects=[]
         this.id=0;
 	}
-
     resize(){
         [this.context.height,this.context.width]=[this.canvas.height,this.canvas.width]=[window.innerHeight,window.innerWidth]
     }
     update(){}
     draw(){
-
         this.poolRenderObjects.forEach((v,i,a)=>{
             if(v){
-                if(v.work){
-                    v.work(this.context)
-                }
                 if(v.draw){
                     v.draw(this.context)
-                }
-                if(v.kill){
-                    let res = v.kill(this.context)
-                    if(res==true){
-                        delete a[i];
-                        this.addRenderObjects(_test,window.innerWidth/2,window.innerHeight/2)
-                    }
-                    
                 }
             }
         })
     }
     init(){this.animLoop()}
-
-    addRenderObjects(obj,x,y){
-        let _cfg = cfg
-        _cfg.angle=randomInt(0,_cfg.angleCount)*(360/_cfg.angleCount)
-        
-        this.poolRenderObjects.push(new obj(this.id++,_cfg,x,y))
+    addRenderObjects(obj){
+        obj.id = this.id++
+        obj.upperLevel_MODULE_ = this
+        if(obj.init){obj.init()}
+        if(obj.upper){obj.upper(this)}
+        this.poolRenderObjects.push(obj)
     }
-
     animLoop (){
-        //this.resize()
+        this.resize()
         this.update()
         this.draw()
         requestAnimationFrame(()=>this.animLoop())
     }
 }
-export default Gra
